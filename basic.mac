@@ -1,0 +1,36 @@
+; Basic Functions Library for IA-32
+;---------------------------------------------------------
+
+; Extern Definitions
+extern  func_NewLine
+
+;---------------------------------------------------------
+
+; Macro Definitions
+
+; Macro to Stack all data and index registers
+%macro  stackReg    0
+    push    eax
+    push    ebx
+    push    ecx
+    push    edx
+    push    esi
+    push    edi
+%endmacro
+
+; Macro to Unstack all data and index registers
+%macro  unstackReg  0
+    pop     edi
+    pop     esi
+    pop     edx
+    pop     ecx
+    pop     ebx
+    pop     eax
+%endmacro
+
+; Macro to print a new line
+%macro  newLine     0
+    stackReg
+    call    func_NewLine
+    unstackReg
+%endmacro
