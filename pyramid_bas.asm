@@ -18,7 +18,7 @@ _start:
             ;print message
             printStr msg
             ;read number
-            ReadChar ah
+            readChar ah
             mov [input],ah
             sub byte [input],30h
 
@@ -30,13 +30,11 @@ print_numbers:
 print:
             inc byte [actual]
             ;print number
-            add byte [actual],30h
-            printChar actual
-            sub byte [actual],30h
+            printInt byte,actual
             ;print space
             printSpace
 
-            ;Verify if there are more numer to print
+            ;Verify if there are more numbers to print
             mov al,[max]
             cmp [actual],al
             jne print
@@ -50,6 +48,4 @@ print:
             jne print_numbers
 
             ;exit
-            mov eax,1
-            mov ebx,0
-            int 80h
+            finishExec

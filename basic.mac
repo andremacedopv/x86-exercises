@@ -4,6 +4,7 @@
 ; Extern Definitions
 extern  func_NewLine,func_PrintChar,func_PrintSpace
 extern  func_PrintCharArray,func_PrintString,func_ReadChar
+extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
 
 ;---------------------------------------------------------
 
@@ -17,6 +18,13 @@ extern  func_PrintCharArray,func_PrintString,func_ReadChar
 ; Macro to Unstack all data and index registers
 %macro  unstackReg  0
     popa
+%endmacro
+
+; Macro to finish a pŕogram
+%macro  finishExec  0
+    mov eax,1
+    mov ebx,0
+    int 80h
 %endmacro
 
 ; Macro to print a new line
@@ -63,8 +71,8 @@ extern  func_PrintCharArray,func_PrintString,func_ReadChar
 %endmacro
 
 ; Macro to read a char
-; Parameter 1 - Where to Put the Char (Can be any general use register or memory ith [])
-%macro  ReadChar    1
+; Parameter 1 - Where to Put the Char (Can be any general use register or memory with [])
+%macro  readChar    1
     stackReg
     push    eax
     push    DWORD 0
@@ -116,4 +124,92 @@ extern  func_PrintCharArray,func_PrintString,func_ReadChar
         mov     %1,al
         pop     eax
     %endif
+%endmacro
+
+; Macro to print an integer
+; Parameter 1 - Register with integer or size especification for memory access (DWORD, WORD or BYTE)
+; Parameter 2 - (Only in Memory Access) Location of integer on memory
+%macro  printInt    1-2
+    stackReg
+    %ifidni     %1,AL
+        and     eax,0x000000FF
+        push    eax
+        call    func_PrintByteInt
+    %elifidni   %1,AH
+        mov     al,ah
+        and     eax,0x000000FF
+        push    eax
+        call    func_PrintByteInt
+    %elifidni   %1,AX
+        and     eax,0x0000FFFF
+        push    eax
+        call    func_PrintShortInt
+    %elifidni   %1,EAX
+        push    eax
+        call    func_PrintLongInt
+    %elifidni   %1,BL
+        and     ebx,0x000000FF
+        push    ebx
+        call    func_PrintByteInt
+    %elifidni   %1,BH
+        mov     bl,bh
+        and     ebx,0x000000FF
+        push    ebx
+        call    func_PrintByteInt
+    %elifidni   %1,BX
+        and     ebx,0x0000FFFF
+        push    ebx
+        call    func_PrintShortInt
+    %elifidni   %1,EBX
+        push    ebx
+        call    func_PrintLongInt
+    %elifidni   %1,CL
+        and     ecx,0x000000FF
+        push    ecx
+        call    func_PrintByteInt
+    %elifidni   %1,CH
+        mov     cl,ch
+        and     ecx,0x000000FF
+        push    ecx
+        call    func_PrintByteInt
+    %elifidni   %1,CX
+        and     ecx,0x0000FFFF
+        push    ecx
+        call    func_PrintShortInt
+    %elifidni   %1,ECX
+        push    ecx
+        call    func_PrintLongInt
+    %elifidni   %1,DL
+        and     edx,0x000000FF
+        push    edx
+        call    func_PrintByteInt
+    %elifidni   %1,DH
+        mov     dl,dh
+        and     edx,0x000000FF
+        push    edx
+        call    func_PrintByteInt
+    %elifidni   %1,DX
+        and     edx,0x0000FFFF
+        push    edx
+        call    func_PrintShortInt
+    %elifidni   %1,EDX
+        push    edx
+        call    func_PrintLongInt
+    %elifidni   %1,BYTE
+        sub     eax,eax
+        mov     byte al,[%2]
+        push    eax
+        call    func_PrintByteInt
+    %elifidni   %1,WORD
+        sub     eax,eax
+        mov     ax,[%2]
+        push    eax
+        call    func_PrintShortInt
+    %elifidni   %1,DWORD
+        mov     eax,[%2]
+        push    eax
+        call    func_PrintLongInt
+    %else
+    %endif
+    unstackReg
 %endmacro
