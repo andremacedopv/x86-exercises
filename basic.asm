@@ -3,7 +3,7 @@
 
 ; Public definitions
 GLOBAL  func_NewLine,func_PrintChar,func_PrintSpace
-GLOBAL  func_PrintCharArray,func_PrintString
+GLOBAL  func_PrintCharArray,func_PrintString,func_ReadChar
 
 ;---------------------------------------------------------
 
@@ -93,3 +93,38 @@ finish:
     int     80h
     leave
     ret     4
+
+; ; func_ReadChar - print a char on the screen
+; ; Parameters - none
+; ; Return - The read char via stack
+; section .text
+; func_ReadChar:
+;     enter   0,0
+;     mov     eax,3
+;     mov     ebx,0
+;     mov     ecx,[ebp+8]
+;     mov     edx,1
+;     int     80h
+;     leave
+;     ret
+
+; func_ReadChar - print a char on the screen
+; Parameters - none
+; Return - The read char via stack
+section  .bss
+Char_buf    RESB 1 
+section .text
+func_ReadChar:
+    enter   0,0
+    pusha
+    mov     eax,3
+    mov     ebx,0
+    mov     ecx,Char_buf
+    mov     edx,1
+    int     80h
+    popa
+    sub     eax,eax
+    mov     al,[Char_buf]
+    mov     [ebp+8],eax
+    leave
+    ret

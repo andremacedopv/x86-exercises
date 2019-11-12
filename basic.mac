@@ -3,7 +3,7 @@
 
 ; Extern Definitions
 extern  func_NewLine,func_PrintChar,func_PrintSpace
-extern  func_PrintCharArray,func_PrintString
+extern  func_PrintCharArray,func_PrintString,func_ReadChar
 
 ;---------------------------------------------------------
 
@@ -60,4 +60,60 @@ extern  func_PrintCharArray,func_PrintString
     push    %1
     call    func_PrintString
     unstackReg
+%endmacro
+
+; Macro to read a char
+; Parameter 1 - Where to Put the Char (Can be any general use register or memory ith [])
+%macro  ReadChar    1
+    stackReg
+    push    eax
+    push    DWORD 0
+    call    func_ReadChar
+    pop     eax
+    %ifidni     %1,AL
+    %elifidni   %1,AH
+        mov     ah,al
+        mov     al,0
+    %elifidni   %1,AX
+    %elifidni   %1,EAX
+    %elifidni   %1,BL
+        mov     bl,al
+        pop     eax
+    %elifidni   %1,BH
+        mov     bh,al
+        pop     eax
+    %elifidni   %1,BX
+        mov     bx,eax
+        pop     eax
+    %elifidni   %1,EBX
+        mov     ebx,eax
+        pop     eax
+    %elifidni   %1,CL
+        mov     cl,al
+        pop     eax
+    %elifidni   %1,CH
+        mov     ch,al
+        pop     eax
+    %elifidni   %1,CX
+        mov     cx,eax
+        pop     eax
+    %elifidni   %1,ECX
+        mov     ecx,eax
+        pop     eax
+    %elifidni   %1,DL
+        mov     dl,al
+        pop     eax
+    %elifidni   %1,DH
+        mov     dh,al
+        pop     eax
+    %elifidni   %1,DX
+        mov     dx,eax
+        pop     eax
+    %elifidni   %1,EDX
+        mov     edx,eax
+        pop     eax
+    %else
+        mov     %1,al
+        pop     eax
+    %endif
 %endmacro

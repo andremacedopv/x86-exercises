@@ -18,11 +18,8 @@ _start:
             ;print message
             printStr msg
             ;read number
-            mov eax,3
-            mov ebx,1
-            mov ecx,input
-            mov edx,1
-            int 80h
+            ReadChar ah
+            mov [input],ah
             sub byte [input],30h
 
             mov byte [max],-1
