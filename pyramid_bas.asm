@@ -38,18 +38,10 @@ print:
             inc byte [actual]
             ;print number
             add byte [actual],30h
-            mov eax,4
-            mov ebx,1
-            mov ecx,actual
-            mov edx,1
-            int 80h
+            printChar actual
             sub byte [actual],30h
             ;print space
-            mov eax,4
-            mov ebx,1
-            mov ecx,space
-            mov edx,size_space
-            int 80h
+            printSpace
 
             ;Verify if there are more numer to print
             mov al,[max]

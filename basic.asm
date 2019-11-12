@@ -2,7 +2,7 @@
 ;---------------------------------------------------------
 
 ; Public definitions
-GLOBAL  func_NewLine
+GLOBAL  func_NewLine,func_PrintChar,func_PrintSpace
 
 ;---------------------------------------------------------
 
@@ -22,3 +22,32 @@ func_NewLine:
     mov     edx,size_nl
     int     80h
     ret
+
+; func_PrintSpace - print a space on the screen
+; Parameters - none
+; Return - none
+section .data
+space    db  ' '
+size_sp  EQU $-space
+section .text
+func_PrintSpace:
+    mov     eax,4
+    mov     ebx,1
+    mov     ecx,space
+    mov     edx,size_sp
+    int     80h
+    ret
+
+; func_PrintChar - print a char on the screen
+; Parameters - Pointer to teh char to be printed via stack
+; Return - none
+section .text
+func_PrintChar:
+    enter   0,0
+    mov     eax,4
+    mov     ebx,1
+    mov     ecx,[ebp+8]
+    mov     edx,1
+    int     80h
+    leave
+    ret     4

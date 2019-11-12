@@ -2,7 +2,7 @@
 ;---------------------------------------------------------
 
 ; Extern Definitions
-extern  func_NewLine
+extern  func_NewLine,func_PrintChar,func_PrintSpace
 
 ;---------------------------------------------------------
 
@@ -10,27 +10,32 @@ extern  func_NewLine
 
 ; Macro to Stack all data and index registers
 %macro  stackReg    0
-    push    eax
-    push    ebx
-    push    ecx
-    push    edx
-    push    esi
-    push    edi
+    pusha
 %endmacro
 
 ; Macro to Unstack all data and index registers
 %macro  unstackReg  0
-    pop     edi
-    pop     esi
-    pop     edx
-    pop     ecx
-    pop     ebx
-    pop     eax
+    popa
 %endmacro
 
 ; Macro to print a new line
 %macro  newLine     0
     stackReg
     call    func_NewLine
+    unstackReg
+%endmacro
+
+; Macro to print a space
+%macro  printSpace  0
+    stackReg
+    call    func_PrintSpace
+    unstackReg
+%endmacro
+
+; Macro to print a char
+%macro  printChar   1
+    stackReg
+    push    %1
+    call    func_PrintChar
     unstackReg
 %endmacro
