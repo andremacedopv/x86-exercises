@@ -1,7 +1,7 @@
 %include "basic.mac"
 
 section .data
-msg         db  'Insira um numero de 0 a 9', 0dh, 0ah
+msg         db  'Insira um numero de 0 a 9', 0dh, 0ah, 0
 size_msg    EQU $-msg
 space       db  ' '
 size_space  EQU $-space
@@ -16,11 +16,7 @@ global _start
 
 _start:
             ;print message
-            mov eax,4
-            mov ebx,1
-            mov ecx,msg
-            mov edx,size_msg
-            int 80h
+            printStr msg
             ;read number
             mov eax,3
             mov ebx,1

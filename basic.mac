@@ -3,6 +3,7 @@
 
 ; Extern Definitions
 extern  func_NewLine,func_PrintChar,func_PrintSpace
+extern  func_PrintCharArray,func_PrintString
 
 ;---------------------------------------------------------
 
@@ -33,9 +34,30 @@ extern  func_NewLine,func_PrintChar,func_PrintSpace
 %endmacro
 
 ; Macro to print a char
+; Parameter 1 - Char Location
 %macro  printChar   1
     stackReg
     push    %1
     call    func_PrintChar
+    unstackReg
+%endmacro
+
+; Macro to print a string of known size
+; Parameter 1 - String Location
+; Parameter 2 - String Size (DWORD)
+%macro  printStr    2
+    stackReg
+    push    %1
+    push    DWORD %2
+    call    func_PrintCharArray
+    unstackReg
+%endmacro
+
+; Macro to print a string ending on zero
+; Parameter 1 - String Location
+%macro  printStr    1
+    stackReg
+    push    %1
+    call    func_PrintString
     unstackReg
 %endmacro
