@@ -5,7 +5,7 @@
 extern  func_NewLine,func_PrintChar,func_PrintSpace
 extern  func_PrintCharArray,func_PrintString,func_ReadChar
 extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
-extern  func_Print64Int, func_waitForEnter
+extern  func_Print64Int, func_waitForEnter, func_ReadStr, func_flush
 
 ;---------------------------------------------------------
 
@@ -157,6 +157,70 @@ extern  func_Print64Int, func_waitForEnter
     %endif
 %endmacro
 
+; Macro to read a string
+; Parameter 1 - Where to Put the String (Memory pointer)
+; Parameter 2 - Maximum size to be read (number) -> You should leave a space for a ending 0
+; Parameter 3 - Where to put lenght read ('NONE' to ignore )
+%macro  readStr    3
+    stackReg
+    push    eax
+    push    DWORD 0
+    push    DWORD %1
+    push    DWORD %2
+    call    func_ReadStr
+    pop eax
+    %ifidni     %3,AL
+        add     esp, 4
+    %elifidni   %3,AH
+        mov     ah,al
+        mov     al,0
+        add     esp, 4
+    %elifidni   %3,AX
+        add     esp, 4
+    %elifidni   %3,EAX
+        add     esp, 4
+    %elifidni   %3,BL
+        mov     bl,al
+        pop     eax
+    %elifidni   %3,BH
+        mov     bh,al
+        pop     eax
+    %elifidni   %3,BX
+        mov     bx,eax
+        pop     eax
+    %elifidni   %3,EBX
+        mov     ebx,eax
+        pop     eax
+    %elifidni   %3,CL
+        mov     cl,al
+        pop     eax
+    %elifidni   %3,CH
+        mov     ch,al
+        pop     eax
+    %elifidni   %3,CX
+        mov     cx,eax
+        pop     eax
+    %elifidni   %3,ECX
+        mov     ecx,eax
+        pop     eax
+    %elifidni   %3,DL
+        mov     dl,al
+        pop     eax
+    %elifidni   %3,DH
+        mov     dh,al
+        pop     eax
+    %elifidni   %3,DX
+        mov     dx,eax
+        pop     eax
+    %elifidni   %3,EDX
+        mov     edx,eax
+        pop     eax
+    %else
+        mov     [%3],al
+        pop     eax
+    %endif
+%endmacro
+
 ; Macro to print an integer
 ; Parameter 1 - Register with integer or size especification for memory access (DWORD, WORD or BYTE)
 ; Parameter 2 - (Only in Memory Access) Location of integer on memory
@@ -248,7 +312,7 @@ extern  func_Print64Int, func_waitForEnter
 ; Macro to print an 64 integer
 ; Parameter 1 - Location of most significant byte (memory without [])
 ; Parameter 2 - Location of least significant byte (memory without [])
-%macro  print64Int    1-2
+%macro  print64Int    2
     stackReg
     %ifidni   %1,EAX
         push    eax

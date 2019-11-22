@@ -10,6 +10,7 @@ section .bss
 input:      RESB    1
 max:        RESB    1
 actual:     RESB    1
+testd:      RESB    20
 
 start
 
@@ -50,6 +51,10 @@ print:
             imul ebx
             print64Int edx,eax
             newLine
+
+            readStr testd,20,eax
+            printStr testd,eax
+            printInt eax
 
             waitForEnter
 

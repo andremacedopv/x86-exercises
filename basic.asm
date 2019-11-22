@@ -5,7 +5,7 @@
 GLOBAL  func_NewLine,func_PrintChar,func_PrintSpace
 GLOBAL  func_PrintCharArray,func_PrintString,func_ReadChar
 GLOBAL  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
-GLOBAL  func_Print64Int, func_waitForEnter, func_flush
+GLOBAL  func_Print64Int, func_waitForEnter, func_flush, func_ReadStr
 
 ;---------------------------------------------------------
 ; Functions dont gurantee the maintence of registers
@@ -94,8 +94,8 @@ func_PrintChar:
     ret     4
 
 ; func_PrintCharArray - print an array of chars on the screen, knowing its size
-; Parameters - Pointer to the strng to be printed via stack (EDP+12)
-;            - Size of the string via stack (DWORD) (EDP+8)
+; Parameters - Pointer to the strng to be printed via stack (EBP+12)
+;            - Size of the string via stack (DWORD) (EBP+8)
 ; Return - none
 section .text
 func_PrintCharArray:
@@ -134,7 +134,7 @@ finish:
     leave
     ret     4
 
-; func_ReadChar - print a char on the screen
+; func_ReadChar - read a char
 ; Parameters - none
 ; Return - The read char via stack
 section  .bss
@@ -142,13 +142,14 @@ Char_buf    RESB 1
 section .text
 func_ReadChar:
     enter   0,0
-    pusha
+    pushad
+    call    func_flush
     mov     eax,3
     mov     ebx,0
     mov     ecx,Char_buf
     mov     edx,1
     int     80h
-    popa
+    popad
     sub     eax,eax
     mov     al,[Char_buf]
     mov     [ebp+8],eax
@@ -158,8 +159,6 @@ func_ReadChar:
 ; func_waitForEnter - Wait for an 'enter' character
 ; Parameters - none
 ; Return - none
-section .data
-enter_c     db  0Dh    
 section .text
 func_waitForEnter:
     enter   0,0
@@ -168,6 +167,26 @@ func_waitForEnter:
     call    func_ReadChar
     leave
     ret
+
+; func_ReadStr - print a char on the screen
+; Parameters - maximum lenght to read [DWORD on EBP+8]
+;            - where to read to (memory pointer) [DWORD on EBP+12]
+; Return - The lenght read in eax
+section  .bss
+section .text
+func_ReadStr:
+    enter   0,0
+    pushad
+    call    func_flush
+    mov     eax,3
+    mov     ebx,0
+    mov     ecx,[EBP+12]
+    mov     edx,[EBP+8]
+    int     80h
+    mov     [EBP+16],eax
+    popad
+    leave
+    ret     8
 
 ; func_PrintLongInt - print a 4 byte integer on the screen
 ; Parameters - Integer to be read via stack
@@ -388,4 +407,4 @@ PI64_Print:
     cmp     edi,esi
     jbe     PI64_Print
     leave
-    ret     4
+    ret     8
