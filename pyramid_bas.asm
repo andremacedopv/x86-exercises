@@ -11,10 +11,8 @@ input:      RESB    1
 max:        RESB    1
 actual:     RESB    1
 
-section .text
-global _start
+start
 
-_start:
             ;print message
             printStr msg
             ;read number
@@ -46,6 +44,14 @@ print:
             mov al,[input]
             cmp [max],al
             jne print_numbers
+
+            mov ebx,50
+            mov eax,0x7FFFFFFF
+            imul ebx
+            print64Int edx,eax
+            newLine
+
+            waitForEnter
 
             ;exit
             finishExec

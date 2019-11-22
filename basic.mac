@@ -5,6 +5,7 @@
 extern  func_NewLine,func_PrintChar,func_PrintSpace
 extern  func_PrintCharArray,func_PrintString,func_ReadChar
 extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
+extern  func_Print64Int, func_waitForEnter
 
 ;---------------------------------------------------------
 
@@ -12,12 +13,25 @@ extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
 
 ; Macro to Stack all data and index registers
 %macro  stackReg    0
-    pusha
+    pushad
 %endmacro
 
 ; Macro to Unstack all data and index registers
 %macro  unstackReg  0
-    popa
+    popad
+%endmacro
+
+; Macro to start a program with global label
+%macro  start       0
+    section .text
+    global _start
+    _start:
+%endmacro
+
+%macro  start_c     0
+    section .text
+    global main
+    main:
 %endmacro
 
 ; Macro to finish a pŕogram
@@ -31,6 +45,20 @@ extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
 %macro  newLine     0
     stackReg
     call    func_NewLine
+    unstackReg
+%endmacro
+
+; Macro to flush terminal input
+%macro  Flush       0
+    stackReg
+    call    func_flush
+    unstackReg
+%endmacro
+
+; Macro to wait for an enter char
+%macro  waitForEnter     0
+    stackReg
+    call    func_waitForEnter
     unstackReg
 %endmacro
 
@@ -73,17 +101,20 @@ extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
 ; Macro to read a char
 ; Parameter 1 - Where to Put the Char (Can be any general use register or memory with [])
 %macro  readChar    1
-    stackReg
     push    eax
     push    DWORD 0
     call    func_ReadChar
     pop     eax
     %ifidni     %1,AL
+        add     esp, 4
     %elifidni   %1,AH
         mov     ah,al
         mov     al,0
+        add     esp, 4
     %elifidni   %1,AX
+        add     esp, 4
     %elifidni   %1,EAX
+        add     esp, 4
     %elifidni   %1,BL
         mov     bl,al
         pop     eax
@@ -211,5 +242,40 @@ extern  func_PrintLongInt,func_PrintShortInt,func_PrintByteInt
         call    func_PrintLongInt
     %else
     %endif
+    unstackReg
+%endmacro
+
+; Macro to print an 64 integer
+; Parameter 1 - Location of most significant byte (memory without [])
+; Parameter 2 - Location of least significant byte (memory without [])
+%macro  print64Int    1-2
+    stackReg
+    %ifidni   %1,EAX
+        push    eax
+    %elifidni   %1,EBX
+        push    ebx
+    %elifidni   %1,ECX
+        push    ecx
+    %elifidni   %1,EDX
+        push    edx
+    %else
+        mov     eax,[%1]
+        push    eax
+    %endif
+    
+    %ifidni   %2,EAX
+        push    eax
+    %elifidni   %2,EBX
+        push    ebx
+    %elifidni   %2,ECX
+        push    ecx
+    %elifidni   %2,EDX
+        push    edx
+    %else
+        mov     eax,[%2]
+        push    eax
+    %endif
+
+    call    func_Print64Int
     unstackReg
 %endmacro
